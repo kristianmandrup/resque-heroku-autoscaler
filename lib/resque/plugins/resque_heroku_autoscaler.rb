@@ -1,8 +1,16 @@
 require 'resque/plugins/heroku_autoscaler/config'
+require 'resque/plugins/heroku_autoscaler/cedar'
 
 module Resque
   module Plugins
     module HerokuAutoscaler
+      def self.included(klass)
+        # do something ti figure out which stack you're on
+        # heroku_client.respond_to?(:set_workers) 
+        # klass.extend Reque......::Cedar
+        klass.extend(Cedar)
+      end
+      
       @@heroku_client = nil
 
       def after_enqueue_scale_workers_up(*args)

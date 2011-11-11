@@ -1,3 +1,5 @@
+require 'resque/plugins/resque_heroku_autoscaler'
+
 module Resque
   module Plugins
     module HerokuAutoscaler
