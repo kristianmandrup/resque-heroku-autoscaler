@@ -1,5 +1,6 @@
 require 'resque/plugins/heroku_autoscaler/config'
 require 'resque/plugins/heroku_autoscaler/cedar'
+require 'heroku'
 
 module Resque
   module Plugins
