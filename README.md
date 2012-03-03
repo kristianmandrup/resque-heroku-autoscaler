@@ -48,7 +48,7 @@ Per default RHA will only start a single worker, no matter how many jobs are pen
 
     Resque::Plugins::HerokuAutoscaler.config do |c|
       c.new_worker_count do |pending|
-        (pending/5).ceil.to_i
+        (pending/5.0).ceil.to_i
       end
     end
 
@@ -62,7 +62,9 @@ You might want to turn off scaling of your workers in development modus. You can
       end
     end
 
+You also need to create a `Procfile` at the root of your project if you don't already have one with the following:
 
+    worker: QUEUE=* bundle exec rake resque:work
 
 [dh]: http://blog.darkhax.com/2010/07/30/auto-scale-your-resque-workers-on-heroku
 [rq]: http://github.com/defunkt/resque
