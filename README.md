@@ -23,6 +23,16 @@ If you prefer you also can configure RHA using a config block. For example you m
       c.heroku_app  = "my_app_#{Rails.env}"
     end
 
+Or if you are on the Cedar stack
+
+    require 'resque/plugins/resque_heroku_autoscaler'
+
+    Resque::Plugins::HerokuAutoscaler::Cedar.config do |c|
+      c.heroku_user = 'john doe'
+      c.heroku_pass = ENV['HEROKU_PASSWORD']
+      c.heroku_app  = "my_app_#{Rails.env}"
+    end
+
 
 To use RHA in one of your jobs, just extend your job class with Resque::Plugins::HerokuAutoscaler.
 
@@ -31,6 +41,7 @@ For example:
     require 'resque/plugins/resque_heroku_autoscaler'
 
     class TestJob
+      # extend Resque::Plugins::HerokuAutoscaler::Cedar
       extend Resque::Plugins::HerokuAutoscaler
 
       @queue = :test
@@ -39,6 +50,12 @@ For example:
        ...awesome stuff...
       end
     end
+
+Or on Cedar stack
+
+    class TestJob
+      extend Resque::Plugins::HerokuAutoscaler::Cedar
+      ...
 
 When you add the job to your Resque queue, a new worker will be started if there isn't already one. If all jobs in the queue are processed the worker will be stopped again, keeping your costs low.
 
