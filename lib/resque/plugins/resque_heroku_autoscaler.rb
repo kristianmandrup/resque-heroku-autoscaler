@@ -30,14 +30,19 @@ module Resque
 
       def set_workers(number_of_workers)
         if number_of_workers != current_workers
-          heroku_client.set_workers(Resque::Plugins::HerokuAutoscaler::Config.heroku_app, number_of_workers)
+          heroku_client.ps_scale(
+            Resque::Plugins::HerokuAutoscaler::Config.heroku_app, 
+            :type => 'worker', :qty => number_of_workers)
         end
       end
 
       def current_workers
         heroku_client.info(Resque::Plugins::HerokuAutoscaler::Config.heroku_app)[:workers].to_i
+        heroku_client.ps(
+          Resque::Plugins::HerokuAutoscaler::Config.heroku_app
+        ).count { |p| p["process"] =~ /worker\.\d?/ }
       end
-
+      
       def heroku_client
         @@heroku_client || @@heroku_client = Heroku::Client.new(Resque::Plugins::HerokuAutoscaler::Config.heroku_user,
                                                                 Resque::Plugins::HerokuAutoscaler::Config.heroku_pass)
@@ -62,6 +67,7 @@ module Resque
         new_count = Resque::Plugins::HerokuAutoscaler::Config.new_worker_count(Resque.info[:pending])
         set_workers(new_count) if new_count == 0 || new_count > current_workers
         Resque.redis.set('last_scaled', Time.now)
+        exit if new_count == 0
       end
 
       def wait_for_task_or_scale
